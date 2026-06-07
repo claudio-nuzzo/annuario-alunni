@@ -260,8 +260,12 @@ function popupHTML(d) {
   return `<div class="popup-inner"><div class="popup-name">${d.nome}</div><div class="popup-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span>· ${d.anno} · ${d.citta}</span></div><div class="popup-job">${d.lavoro}</div>${frase}${ig}</div>`;
 }
 
-function cardHTML(d, idx) {
-  return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div><div class="card-location">→ ${d.citta}</div></div>`;
+function cardHTML(d, idx, mIdx) {
+  const hasCoords = d.lat && d.lng;
+  const locationLine = hasCoords
+    ? `<div class="card-location" onclick="selectDiplomato(${idx},${mIdx}); event.stopPropagation()">→ ${d.citta || 'Posizione sulla mappa'}</div>`
+    : `<div class="card-location" style="color:var(--ink-muted);cursor:default">📍 ${d.citta || 'Posizione non disponibile'}</div>`;
+  return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx},${hasCoords ? mIdx : 'null'})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div>${locationLine}</div>`;
 }
 
 function render(data) {
@@ -272,22 +276,33 @@ function render(data) {
   const filtered = currentFilter === 'tutti' ? data : data.filter(d => d.indirizzo === currentFilter);
   if (filtered.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
+  // Indice marker separato: solo i record con coordinate
+  let markerIdx = 0;
   filtered.forEach((d, i) => {
-    const marker = L.marker([d.lat, d.lng], { icon: createIcon(d.indirizzo) }).addTo(map).bindPopup(popupHTML(d), { maxWidth: 280 });
-    marker.on('click', () => highlightCard(i));
-    markers.push(marker);
-    list.innerHTML += cardHTML(d, i);
+    const hasCoords = d.lat && d.lng;
+    let mIdx = null;
+    if (hasCoords) {
+      const marker = L.marker([d.lat, d.lng], { icon: createIcon(d.indirizzo) }).addTo(map).bindPopup(popupHTML(d), { maxWidth: 280 });
+      const capturedMIdx = markerIdx;
+      marker.on('click', () => highlightCard(i));
+      markers.push(marker);
+      mIdx = markerIdx;
+      markerIdx++;
+    }
+    list.innerHTML += cardHTML(d, i, mIdx);
   });
   const label = currentFilter === 'tutti' ? 'tutti gli indirizzi' : currentFilter;
   document.getElementById('sidebarHeader').textContent = `Diplomati — ${label} (${filtered.length})`;
 }
 
-function selectDiplomato(idx) {
+function selectDiplomato(idx, mIdx) {
   document.querySelectorAll('.alumni-card').forEach(c => c.classList.remove('selected'));
   const card = document.querySelector(`.alumni-card[data-idx="${idx}"]`);
   if (card) card.classList.add('selected');
-  const marker = markers[idx];
-  if (marker) { map.setView(marker.getLatLng(), Math.max(map.getZoom(), 6), { animate: true }); marker.openPopup(); }
+  if (mIdx !== null && mIdx !== undefined && markers[mIdx]) {
+    map.setView(markers[mIdx].getLatLng(), Math.max(map.getZoom(), 6), { animate: true });
+    markers[mIdx].openPopup();
+  }
 }
 
 function highlightCard(idx) {
@@ -314,7 +329,7 @@ async function loadData() {
   document.getElementById('formLink').href = FORM_URL;
   try {
     if (SCRIPT_URL && !SCRIPT_URL.startsWith('QUI')) {
-      const res = await fetch(SCRIPT_URL); allData = (await res.json()).filter(d => d.lat && d.lng);
+      const res = await fetch(SCRIPT_URL); allData = await res.json();
     } else { allData = DEMO_DATA; }
   } catch(e) { allData = DEMO_DATA; }
   updateStats(allData); render(allData);
