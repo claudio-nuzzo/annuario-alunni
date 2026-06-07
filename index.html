@@ -318,7 +318,8 @@ function driveView(url) {
 
 function parseFoto(fotoField) {
   if (!fotoField) return [];
-  return fotoField.split(',').map(s => s.trim()).filter(Boolean);
+  if (Array.isArray(fotoField)) return fotoField.filter(Boolean);
+  return String(fotoField).split(',').map(s => s.trim()).filter(Boolean);
 }
 
 function openFotoLightbox(viewUrl) {
@@ -344,11 +345,9 @@ function cardHTML(d, idx, mIdx) {
     : `<div class="card-location" style="color:var(--ink-muted);cursor:default">📍 ${d.citta || 'Posizione non disponibile'}</div>`;
   const foto = parseFoto(d.foto);
   const fotoStrip = foto.length > 0
-    ? `<div class="card-foto-strip">${foto.map(url => {
-        const thumb = driveThumb(url);
-        const view  = driveView(url);
-        return thumb ? `<img class="card-foto-thumb" src="${thumb}" alt="foto" loading="lazy" onclick="openFotoLightbox('${view}'); event.stopPropagation()" onerror="this.style.display='none'">` : '';
-      }).join('')}</div>`
+    ? `<div class="card-foto-strip">${foto.map(url =>
+        `<img class="card-foto-thumb" src="${url}" alt="foto" loading="lazy" onclick="openFotoLightbox('${url}'); event.stopPropagation()" onerror="this.style.display='none'">`
+      ).join('')}</div>`
     : '';
   return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx},${hasCoords ? mIdx : 'null'})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div>${locationLine}${fotoStrip}</div>`;
 }
