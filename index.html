@@ -106,6 +106,38 @@
   .card-job { font-size: 0.82rem; color: var(--ink); opacity: 0.75; margin-bottom: 0.2rem; }
   .card-location { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); display: flex; align-items: center; gap: 0.3rem; }
 
+  /* ── FOTO THUMBNAIL ── */
+  .card-foto-strip { display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap; }
+  .card-foto-thumb {
+    width: 56px; height: 56px; object-fit: cover;
+    border-radius: var(--radius); border: 1px solid var(--border);
+    cursor: zoom-in; transition: opacity 0.2s, transform 0.2s;
+    background: var(--bg);
+  }
+  .card-foto-thumb:hover { opacity: 0.85; transform: scale(1.04); }
+
+  /* ── FOTO LIGHTBOX ── */
+  .foto-lightbox {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(26,24,20,0.92); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .foto-lightbox.open { display: flex; }
+  .foto-lightbox img {
+    max-width: min(90vw, 900px); max-height: 85vh;
+    object-fit: contain; border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .foto-lightbox-close {
+    position: fixed; top: 1.2rem; right: 1.5rem;
+    background: none; border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.4rem 1rem; cursor: pointer; border-radius: var(--radius);
+    transition: background 0.2s;
+  }
+  .foto-lightbox-close:hover { background: rgba(255,255,255,0.1); }
+
   /* ── POPUP ── */
   .leaflet-popup-content-wrapper { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 2px !important; box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important; padding: 0 !important; }
   .leaflet-popup-tip { background: var(--surface) !important; }
@@ -226,6 +258,11 @@
   <div class="footer-right"><a href="https://www.istitutostradivari.it" target="_blank" rel="noopener">www.istitutostradivari.it</a></div>
 </footer>
 
+<div class="foto-lightbox" id="fotoLightbox">
+  <button class="foto-lightbox-close" onclick="closeFotoLightbox()">✕ Chiudi</button>
+  <img id="fotoLightboxImg" src="" alt="">
+</div>
+
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyab-uEJt-eO23l0OVBoPRa_s_YP83jsIUL_d_CCUkR6BZGzTdz4W_AMJyAIjKMCQzORg/exec';
 const FORM_URL   = 'https://forms.gle/K5bL8SxU8PG2LU3T8';
@@ -260,12 +297,59 @@ function popupHTML(d) {
   return `<div class="popup-inner"><div class="popup-name">${d.nome}</div><div class="popup-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span>· ${d.anno} · ${d.citta}</span></div><div class="popup-job">${d.lavoro}</div>${frase}${ig}</div>`;
 }
 
+function driveThumb(url) {
+  // estrae l'ID da vari formati Google Drive e restituisce URL thumbnail
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return `https://drive.google.com/thumbnail?id=${m1[1]}&sz=w120`;
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w120`;
+  return null;
+}
+
+function driveView(url) {
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+  return url;
+}
+
+function parseFoto(fotoField) {
+  if (!fotoField) return [];
+  return fotoField.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function openFotoLightbox(viewUrl) {
+  document.getElementById('fotoLightboxImg').src = viewUrl;
+  document.getElementById('fotoLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFotoLightbox() {
+  document.getElementById('fotoLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('fotoLightbox').addEventListener('click', function(e) {
+  if (e.target === this) closeFotoLightbox();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFotoLightbox(); });
+
 function cardHTML(d, idx, mIdx) {
   const hasCoords = d.lat && d.lng;
   const locationLine = hasCoords
     ? `<div class="card-location" onclick="selectDiplomato(${idx},${mIdx}); event.stopPropagation()">→ ${d.citta || 'Posizione sulla mappa'}</div>`
     : `<div class="card-location" style="color:var(--ink-muted);cursor:default">📍 ${d.citta || 'Posizione non disponibile'}</div>`;
-  return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx},${hasCoords ? mIdx : 'null'})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div>${locationLine}</div>`;
+  const foto = parseFoto(d.foto);
+  const fotoStrip = foto.length > 0
+    ? `<div class="card-foto-strip">${foto.map(url => {
+        const thumb = driveThumb(url);
+        const view  = driveView(url);
+        return thumb ? `<img class="card-foto-thumb" src="${thumb}" alt="foto" loading="lazy" onclick="openFotoLightbox('${view}'); event.stopPropagation()" onerror="this.style.display='none'">` : '';
+      }).join('')}</div>`
+    : '';
+  return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx},${hasCoords ? mIdx : 'null'})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div>${locationLine}${fotoStrip}</div>`;
+}
 }
 
 function render(data) {
