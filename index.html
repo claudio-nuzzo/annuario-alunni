@@ -350,7 +350,6 @@ function cardHTML(d, idx, mIdx) {
     : '';
   return `<div class="alumni-card" data-indirizzo="${d.indirizzo}" data-idx="${idx}" onclick="selectDiplomato(${idx},${hasCoords ? mIdx : 'null'})"><div class="card-name">${d.nome}</div><div class="card-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span class="card-anno">${d.anno}</span></div><div class="card-job">${d.lavoro}</div>${locationLine}${fotoStrip}</div>`;
 }
-}
 
 function render(data) {
   markers.forEach(m => map.removeLayer(m)); markers = [];
