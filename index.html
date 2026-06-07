@@ -297,21 +297,23 @@ function popupHTML(d) {
   return `<div class="popup-inner"><div class="popup-name">${d.nome}</div><div class="popup-meta"><span class="tag ${TAG_CLASS[d.indirizzo]}">${d.indirizzo}</span><span>· ${d.anno} · ${d.citta}</span></div><div class="popup-job">${d.lavoro}</div>${frase}${ig}</div>`;
 }
 
-function driveThumb(url) {
-  // estrae l'ID da vari formati Google Drive e restituisce URL thumbnail
+function driveId(url) {
+  if (!url) return null;
   const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m1) return `https://drive.google.com/thumbnail?id=${m1[1]}&sz=w120`;
+  if (m1) return m1[1];
   const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w120`;
+  if (m2) return m2[1];
   return null;
 }
 
+function driveThumb(url) {
+  const id = driveId(url);
+  return id ? `https://lh3.googleusercontent.com/d/${id}=w120` : null;
+}
+
 function driveView(url) {
-  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
-  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
-  return url;
+  const id = driveId(url);
+  return id ? `https://lh3.googleusercontent.com/d/${id}=w1200` : url;
 }
 
 function parseFoto(fotoField) {
@@ -385,6 +387,9 @@ function selectDiplomato(idx, mIdx) {
   if (mIdx !== null && mIdx !== undefined && markers[mIdx]) {
     map.setView(markers[mIdx].getLatLng(), Math.max(map.getZoom(), 6), { animate: true });
     markers[mIdx].openPopup();
+  } else {
+    // nessuna coordinata: chiudi qualsiasi popup aperto
+    map.closePopup();
   }
 }
 
