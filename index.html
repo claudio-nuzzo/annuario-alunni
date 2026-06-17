@@ -174,11 +174,14 @@
   @media (max-width: 768px) {
     nav { padding: 0 1rem; }
     .nav-links { display: none; }
-    .main-layout { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; height: auto; }
-    .sidebar { border-left: none; border-top: 1px solid var(--border); max-height: 50vh; }
-    .stat { padding: 1rem; }
+    .main-layout { grid-template-columns: 1fr; grid-template-rows: 55vh auto; height: auto; min-height: 0; }
+    #map { min-height: 320px; }
+    .sidebar { border-left: none; border-top: 1px solid var(--border); }
+    .stats-bar { flex-wrap: wrap; }
+    .stat { padding: 0.9rem 1rem; flex: 1 1 50%; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     header { padding: 2rem 1rem 1.5rem; }
-    .filters-row { padding: 0.7rem 1rem; }
+    .filters-row { padding: 0.7rem 1rem; gap: 0.4rem; }
+    .filter-btn { padding: 0.45rem 0.9rem; font-size: 0.68rem; }
     footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem 1rem; }
   }
 </style>
@@ -285,6 +288,20 @@ const DEMO_DATA = [
 const COLORS = { 'Moda':'#b85470','Arredo':'#3a6ea8','Liceo Artistico':'#4a9a5a','Liceo Musicale':'#8a4a9a','Liuteria':'#c07030' };
 const TAG_CLASS = { 'Moda':'tag-moda','Arredo':'tag-arredo','Liceo Artistico':'tag-artistico','Liceo Musicale':'tag-musicale','Liuteria':'tag-liuteria' };
 
+// Normalizza la dicitura dell'indirizzo: gestisce maiuscole/minuscole, spazi
+// e varianti ("Liceo musicale", "MODA", "Liutaio", "Artistico"...) riportando
+// tutto alle 5 etichette canoniche usate da filtri, colori e tag.
+function canonIndirizzo(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim().toLowerCase();
+  if (s.indexOf('moda') !== -1) return 'Moda';
+  if (s.indexOf('arredo') !== -1) return 'Arredo';
+  if (s.indexOf('liuteria') !== -1 || s.indexOf('liutaio') !== -1) return 'Liuteria';
+  if (s.indexOf('music') !== -1) return 'Liceo Musicale';
+  if (s.indexOf('artist') !== -1) return 'Liceo Artistico';
+  return String(raw).trim();
+}
+
 const map = L.map('map', { center: [48, 14], zoom: 4 });
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO', maxZoom: 18 }).addTo(map);
 
@@ -364,21 +381,23 @@ function render(data) {
   const filtered = currentFilter === 'tutti' ? data : data.filter(d => d.indirizzo === currentFilter);
   if (filtered.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  // Indice marker separato: solo i record con coordinate
+  // Costruiamo l'HTML in un array e lo inseriamo UNA volta sola:
+  // così il browser non ridisegna la lista a ogni scheda (molto più veloce).
   let markerIdx = 0;
+  const cards = [];
   filtered.forEach((d, i) => {
     const hasCoords = d.lat && d.lng;
     let mIdx = null;
     if (hasCoords) {
       const marker = L.marker([d.lat, d.lng], { icon: createIcon(d.indirizzo) }).addTo(map).bindPopup(popupHTML(d), { maxWidth: 280 });
-      const capturedMIdx = markerIdx;
       marker.on('click', () => highlightCard(i));
       markers.push(marker);
       mIdx = markerIdx;
       markerIdx++;
     }
-    list.innerHTML += cardHTML(d, i, mIdx);
+    cards.push(cardHTML(d, i, mIdx));
   });
+  list.innerHTML = cards.join('');
   const label = currentFilter === 'tutti' ? 'tutti gli indirizzi' : currentFilter;
   document.getElementById('sidebarHeader').textContent = `Diplomati — ${label} (${filtered.length})`;
 }
@@ -391,7 +410,6 @@ function selectDiplomato(idx, mIdx) {
     map.setView(markers[mIdx].getLatLng(), Math.max(map.getZoom(), 6), { animate: true });
     markers[mIdx].openPopup();
   } else {
-    // nessuna coordinata: chiudi qualsiasi popup aperto
     map.closePopup();
   }
 }
@@ -423,7 +441,10 @@ async function loadData() {
       const res = await fetch(SCRIPT_URL); allData = await res.json();
     } else { allData = DEMO_DATA; }
   } catch(e) { allData = DEMO_DATA; }
+  // Normalizza la dicitura dell'indirizzo PRIMA di filtri/colori/tag.
+  allData.forEach(d => { d.indirizzo = canonIndirizzo(d.indirizzo); });
   updateStats(allData); render(allData);
+  setTimeout(() => { map.invalidateSize(); }, 300);
   setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 500);
 }
 loadData();
