@@ -7,19 +7,19 @@
 <link rel="icon" type="image/svg+xml" href="https://stradilab.org/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
-    --bg: #f7f5f0;
+    --bg: #f6f4ef;
     --surface: #ffffff;
-    --ink: #1a1814;
-    --ink-soft: #5a5550;
-    --ink-muted: #9a9590;
-    --accent: #2d5a3d;
-    --border: #e2ddd8;
-    --border-strong: #c8c3bc;
+    --ink: #16130f;
+    --ink-soft: #5c574f;
+    --ink-muted: #a8a196;
+    --accent: #9b2335;
+    --border: #e2ddd3;
+    --border-strong: #c9c2b7;
     --radius: 2px;
     --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
     --moda: #b85470;
@@ -30,7 +30,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; font-weight: 300; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
   /* ── NAV ── */
   nav {
@@ -45,28 +45,28 @@
   .nav-brand { display: flex; align-items: center; text-decoration: none; height: 100%; }
   .nav-brand svg { height: 30px; width: auto; display: block; }
   .nav-links { display: flex; gap: 2rem; list-style: none; }
-  .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--ink-soft); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a { font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; color: var(--ink-soft); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
   .nav-links a:hover { color: var(--accent); }
 
   /* ── HEADER ── */
   header { padding: 3rem 2rem 2rem; border-bottom: 1px solid var(--border); max-width: 1200px; margin: 0 auto; }
-  .header-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+  .header-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
   .header-label::after { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--accent); opacity: 0.5; }
-  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 5.5vw, 4.2rem); font-weight: 300; line-height: 1.05; margin-bottom: 0.4rem; }
-  h1 em { font-style: italic; color: var(--accent); }
-  .subtitle { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: var(--ink-soft); margin-top: 0.5rem; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2.4rem, 5.5vw, 4.2rem); font-weight: 300; line-height: 1.05; margin-bottom: 0.4rem; }
+  h1 em { font-style: normal; font-weight: 600; color: var(--accent); }
+  .subtitle { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; color: var(--ink-soft); margin-top: 0.5rem; }
 
   /* ── STATS ── */
   .stats-bar { display: flex; border-bottom: 1px solid var(--border); background: var(--bg); }
   .stat { flex: 1; padding: 1.2rem 2rem; border-right: 1px solid var(--border); }
   .stat:last-child { border-right: none; }
-  .stat-number { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; display: block; line-height: 1; margin-bottom: 0.2rem; }
-  .stat-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .stat-number { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 300; display: block; line-height: 1; margin-bottom: 0.2rem; }
+  .stat-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; color: var(--ink-muted); letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* ── FILTERS ── */
   .filters-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.9rem 2rem; border-bottom: 1px solid var(--border); background: var(--bg); flex-wrap: wrap; }
-  .filters-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-right: 0.5rem; }
-  .filter-btn { padding: 0.3rem 0.85rem; border-radius: 1px; border: 1px solid var(--border); background: transparent; color: var(--ink-muted); font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.18s; }
+  .filters-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-right: 0.5rem; }
+  .filter-btn { padding: 0.3rem 0.85rem; border-radius: 1px; border: 1px solid var(--border); background: transparent; color: var(--ink-muted); font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.18s; }
   .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .filter-btn[data-filter="Moda"].active    { background: var(--moda);    border-color: var(--moda); }
@@ -82,11 +82,11 @@
 
   /* ── SIDEBAR ── */
   .sidebar { background: var(--surface); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
-  .sidebar-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+  .sidebar-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); position: sticky; top: 0; background: var(--surface); z-index: 1; }
   .alumni-list { flex: 1; }
   .alumni-card { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; position: relative; }
   .alumni-card:hover { background: var(--bg); }
-  .alumni-card.selected { background: #f0f5f1; }
+  .alumni-card.selected { background: #f3dcdf; }
   .alumni-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; opacity: 0; transition: opacity 0.2s; }
   .alumni-card:hover::before, .alumni-card.selected::before { opacity: 1; }
   .alumni-card[data-indirizzo="Moda"]::before           { background: var(--moda); }
@@ -94,17 +94,17 @@
   .alumni-card[data-indirizzo="Liceo Artistico"]::before { background: var(--artistico); }
   .alumni-card[data-indirizzo="Liceo Musicale"]::before  { background: var(--musicale); }
   .alumni-card[data-indirizzo="Liuteria"]::before        { background: var(--liuteria); }
-  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 0.25rem; }
+  .card-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 0.25rem; }
   .card-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.3rem; }
-  .tag { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 1px; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tag { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 1px; font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
   .tag-moda      { background: rgba(184,84,112,0.1); color: var(--moda); }
   .tag-arredo    { background: rgba(58,110,168,0.1); color: var(--arredo); }
   .tag-artistico { background: rgba(74,154,90,0.1);  color: var(--artistico); }
   .tag-musicale  { background: rgba(138,74,154,0.1); color: var(--musicale); }
   .tag-liuteria  { background: rgba(192,112,48,0.1); color: var(--liuteria); }
-  .card-anno { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-muted); }
+  .card-anno { font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; color: var(--ink-muted); }
   .card-job { font-size: 0.82rem; color: var(--ink); opacity: 0.75; margin-bottom: 0.2rem; }
-  .card-location { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); display: flex; align-items: center; gap: 0.3rem; }
+  .card-location { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; color: var(--accent); display: flex; align-items: center; gap: 0.3rem; }
 
   /* ── FOTO THUMBNAIL ── */
   .card-foto-strip { display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap; }
@@ -131,7 +131,7 @@
   .foto-lightbox-close {
     position: fixed; top: 1.2rem; right: 1.5rem;
     background: none; border: 1px solid rgba(255,255,255,0.3);
-    color: #fff; font-family: 'DM Mono', monospace;
+    color: #fff; font-family: 'Space Grotesk', sans-serif;
     font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
     padding: 0.4rem 1rem; cursor: pointer; border-radius: var(--radius);
     transition: background 0.2s;
@@ -143,32 +143,32 @@
   .leaflet-popup-tip { background: var(--surface) !important; }
   .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
   .popup-inner { padding: 1.2rem; }
-  .popup-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; margin-bottom: 0.3rem; }
-  .popup-meta { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-muted); display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+  .popup-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 400; margin-bottom: 0.3rem; }
+  .popup-meta { font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; color: var(--ink-muted); display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
   .popup-job { font-size: 0.85rem; color: var(--ink); opacity: 0.85; margin-bottom: 0.5rem; }
-  .popup-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.92rem; color: var(--accent); border-left: 2px solid var(--accent); padding-left: 0.7rem; margin-top: 0.5rem; line-height: 1.5; }
-  .popup-instagram { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.7rem; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
+  .popup-quote { font-family: 'Space Grotesk', sans-serif; font-style: normal; font-size: 0.92rem; color: var(--accent); border-left: 2px solid var(--accent); padding-left: 0.7rem; margin-top: 0.5rem; line-height: 1.5; }
+  .popup-instagram { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.7rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
   .popup-instagram:hover { opacity: 0.7; }
   .leaflet-popup-close-button { color: var(--ink-muted) !important; }
 
   /* ── CTA ── */
   .cta-partecipa { padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: var(--surface); position: sticky; bottom: 0; }
-  .cta-btn { display: block; width: 100%; padding: 0.7rem; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; }
-  .cta-btn:hover { background: #1e3d29; }
+  .cta-btn { display: block; width: 100%; padding: 0.7rem; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; }
+  .cta-btn:hover { background: #7a1c2b; }
 
   /* ── EMPTY / LOADING ── */
   .empty-state { padding: 3rem 1.5rem; text-align: center; color: var(--ink-muted); font-size: 0.85rem; display: none; font-style: italic; }
   .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s; }
   .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-  .loading-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1.2rem; }
+  .loading-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1.2rem; }
   .loading-bar { width: 80px; height: 1px; background: var(--border); overflow: hidden; }
   .loading-bar-inner { height: 100%; background: var(--accent); animation: loading 1.4s ease-in-out infinite; }
   @keyframes loading { 0% { width: 0; margin-left: 0; } 50% { width: 100%; margin-left: 0; } 100% { width: 0; margin-left: 100%; } }
 
   /* ── FOOTER ── */
   footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; }
-  .footer-left { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--ink-muted); letter-spacing: 0.06em; }
-  .footer-right a { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--ink-muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+  .footer-left { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; color: var(--ink-muted); letter-spacing: 0.06em; }
+  .footer-right a { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; color: var(--ink-muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
   .footer-right a:hover { color: var(--accent); }
 
   @media (max-width: 768px) {
